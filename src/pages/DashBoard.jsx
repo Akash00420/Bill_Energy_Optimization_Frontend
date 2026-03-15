@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import BillSummary from "./BillSummary";
 import SavingsCard from "./SavingsCard";
 import UsageInsights from "./UsageInsights";
+import DownloadReport from "./DownloadReport";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -63,9 +64,12 @@ const Dashboard = () => {
           <h2>Dashboard</h2>
           <p>Welcome back, <strong>{data.customerName}</strong> &nbsp;·&nbsp; {data.billMonth}</p>
         </div>
-        <button className="dash-upload-btn" onClick={() => navigate("/upload")}>
-          ⚡ Upload New Bill
-        </button>
+        <div className="dash-header-btns">
+          <DownloadReport data={data} />
+          <button className="dash-upload-btn" onClick={() => navigate("/upload")}>
+            ⚡ Upload New Bill
+          </button>
+        </div>
       </div>
 
       {/* ── Info Bar ── */}
@@ -115,12 +119,12 @@ const Dashboard = () => {
       <div className="dash-chart-card">
         <h3>🧾 Bill Breakdown</h3>
         {[
-          { label: "Energy Charges",       value: data.energyCharges,       color: "#3b82f6" },
-          { label: "Fixed/Demand Charges", value: data.fixedDemandCharges,  color: "#8b5cf6" },
-          { label: "Govt Duty",            value: data.govtDuty,            color: "#f59e0b" },
-          { label: "Meter Rent",           value: data.meterRent,           color: "#10b981" },
-          { label: "Adjustments",          value: data.adjustments,         color: "#6366f1" },
-          { label: "Rebate",               value: data.rebate,              color: "#ef4444" },
+          { label: "Energy Charges",       value: data.energyCharges,      color: "#3b82f6" },
+          { label: "Fixed/Demand Charges", value: data.fixedDemandCharges, color: "#8b5cf6" },
+          { label: "Govt Duty",            value: data.govtDuty,           color: "#f59e0b" },
+          { label: "Meter Rent",           value: data.meterRent,          color: "#10b981" },
+          { label: "Adjustments",          value: data.adjustments,        color: "#6366f1" },
+          { label: "Rebate",               value: data.rebate,             color: "#ef4444" },
         ].map((item) => (
           <div className="bar-row" key={item.label}>
             <span className="bar-label">{item.label}</span>

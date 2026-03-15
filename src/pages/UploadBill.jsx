@@ -1,259 +1,342 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { createBill } from "../Reducer/BillSlice";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Loader from "./Loader";
+import { uploadBill, clearError } from "../Reducer/BillSlice";
+import "../assets/custom.css";
+
+const initialForm = {
+  consumerNumber: "",
+  customerName: "",
+  address: "",
+  consumerType: "Domestic",
+  billMonth: "",
+  billDate: "",
+  dueDate: "",
+  unitsBilled: "",
+  energyCharges: "",
+  fixedDemandCharges: "",
+  govtDuty: "",
+  meterRent: "",
+  adjustments: "",
+  grossAmount: "",
+  rebate: "",
+  netAmount: "",
+  loadKVA: "",
+  securityDeposit: "",
+};
 
 const UploadBill = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.bill);
+  const [form, setForm] = useState(initialForm);
+  const [file, setFile] = useState(null);
+  const [formError, setFormError] = useState("");
 
-  const [formData, setFormData] = useState({
-    consumerNumber: "",
-    customerName: "",
-    billMonth: "",
-    billDate: "",
-    dueDate: "",
-    unitsBilled: "",
-    grossAmount: "",
-    netAmount: "",
-    energyCharges: "",
-    fixedDemandCharges: "",
-    govtDuty: "",
-    meterRent: "",
-    rebate: "",
-    adjustments: "",
-    consumerType: "Domestic",
-    paymentStatus: "Pending",
-    address: "",
-    loadKVA: "",
-    securityDeposit: "",
-  });
+  useEffect(() => { dispatch(clearError()); }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setFormError("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const saved =
+    (parseFloat(form.grossAmount) || 0) - (parseFloat(form.netAmount) || 0);
+  const ratePerUnit =
+    form.unitsBilled > 0 && form.energyCharges > 0
+      ? (parseFloat(form.energyCharges) / parseFloat(form.unitsBilled)).toFixed(2)
+      : "0.00";
 
-    // convert number fields from string to number
-    const payload = {
-      ...formData,
-      unitsBilled: Number(formData.unitsBilled),
-      grossAmount: Number(formData.grossAmount),
-      netAmount: Number(formData.netAmount),
-      energyCharges: Number(formData.energyCharges),
-      fixedDemandCharges: Number(formData.fixedDemandCharges),
-      govtDuty: Number(formData.govtDuty),
-      meterRent: Number(formData.meterRent),
-      rebate: Number(formData.rebate),
-      adjustments: Number(formData.adjustments),
-      loadKVA: Number(formData.loadKVA),
-      securityDeposit: Number(formData.securityDeposit),
-    };
-
-    const result = await dispatch(createBill(payload));
-
-    if (createBill.fulfilled.match(result)) {
-      navigate("/dashboard");
+  const validate = () => {
+    const required = [
+      "consumerNumber","customerName","billMonth","billDate",
+      "dueDate","unitsBilled","grossAmount","netAmount",
+    ];
+    for (let f of required) {
+      if (!form[f]) {
+        setFormError(`Please fill in: ${f.replace(/([A-Z])/g, " $1").toLowerCase()}`);
+        return false;
+      }
     }
+    if (!file) { setFormError("Please attach your bill image or PDF"); return false; }
+    return true;
   };
 
-  if (loading) return <Loader />;
+  const handleSubmit = async () => {
+    if (!validate()) return;
+    const result = await dispatch(uploadBill({ file, ...form }));
+    if (uploadBill.fulfilled.match(result)) navigate("/dashboard");
+  };
 
   return (
-    <div className="upload-page">
-      <div className="upload-card" style={{ maxWidth: "600px" }}>
-        <h2>📋 Enter Bill Details</h2>
-        <p>Fill in your electricity bill details for analysis.</p>
+    <div className="ub-page">
+      <div className="ub-wrap">
 
-        {error && (
-          <p style={{ color: "red", marginBottom: "12px" }}>❌ {error}</p>
+        {/* ── Page Header ── */}
+        <div className="ub-page-header">
+          <h1>Add Electricity Bill</h1>
+          <p>Enter your bill details to get personalised savings insights</p>
+        </div>
+
+        {(error || formError) && (
+          <div className="ub-error">❌ {formError || error}</div>
         )}
 
-        <form onSubmit={handleSubmit}>
-
-          {/* ── Required Fields ─────────────────────── */}
-          <div className="form-section">
-            <h4>Required Info</h4>
-
-            <div className="form-group">
-              <label>Consumer Number *</label>
+        {/* ── Card 1: Consumer Details ── */}
+        <div className="ub-card">
+          <div className="ub-card-header">
+            <div className="ub-accent blue"></div>
+            <div className="ub-step-badge blue">1</div>
+            <div>
+              <h3>Consumer Details</h3>
+              <p>Basic account information from your bill header</p>
+            </div>
+          </div>
+          <div className="ub-grid2">
+            <div className="ub-field">
+              <label>Consumer Number <span className="ub-req">*</span></label>
               <input
                 name="consumerNumber"
-                value={formData.consumerNumber}
+                value={form.consumerNumber}
                 onChange={handleChange}
-                placeholder="e.g. 123456789"
-                required
+                placeholder="e.g. 12000826491"
               />
             </div>
-
-            <div className="form-group">
-              <label>Customer Name *</label>
+            <div className="ub-field">
+              <label>Customer Name <span className="ub-req">*</span></label>
               <input
                 name="customerName"
-                value={formData.customerName}
+                value={form.customerName}
                 onChange={handleChange}
-                placeholder="e.g. Akash Ghosh"
-                required
+                placeholder="Full name on bill"
               />
             </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Bill Month *</label>
-                <input
-                  name="billMonth"
-                  value={formData.billMonth}
-                  onChange={handleChange}
-                  placeholder="e.g. 02/2025"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Consumer Type</label>
-                <select name="consumerType" value={formData.consumerType} onChange={handleChange}>
-                  <option value="Domestic">Domestic</option>
-                  <option value="Commercial">Commercial</option>
-                  <option value="Industrial">Industrial</option>
-                </select>
-              </div>
+            <div className="ub-field">
+              <label>Consumer Type</label>
+              <select name="consumerType" value={form.consumerType} onChange={handleChange}>
+                <option value="Domestic">Domestic</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Industrial">Industrial</option>
+              </select>
             </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Bill Date *</label>
-                <input
-                  type="date"
-                  name="billDate"
-                  value={formData.billDate}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Due Date *</label>
-                <input
-                  type="date"
-                  name="dueDate"
-                  value={formData.dueDate}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Units Billed (kWh) *</label>
-              <input
-                type="number"
-                name="unitsBilled"
-                value={formData.unitsBilled}
-                onChange={handleChange}
-                placeholder="e.g. 320"
-                min="0"
-                required
-              />
-            </div>
-          </div>
-
-          {/* ── Amount Fields ────────────────────────── */}
-          <div className="form-section">
-            <h4>Bill Amounts (₹)</h4>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Gross Amount *</label>
-                <input
-                  type="number"
-                  name="grossAmount"
-                  value={formData.grossAmount}
-                  onChange={handleChange}
-                  placeholder="e.g. 1900"
-                  min="0"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Net Amount *</label>
-                <input
-                  type="number"
-                  name="netAmount"
-                  value={formData.netAmount}
-                  onChange={handleChange}
-                  placeholder="e.g. 1850"
-                  min="0"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Energy Charges</label>
-                <input type="number" name="energyCharges" value={formData.energyCharges} onChange={handleChange} placeholder="0" min="0" />
-              </div>
-              <div className="form-group">
-                <label>Fixed/Demand Charges</label>
-                <input type="number" name="fixedDemandCharges" value={formData.fixedDemandCharges} onChange={handleChange} placeholder="0" min="0" />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Govt Duty</label>
-                <input type="number" name="govtDuty" value={formData.govtDuty} onChange={handleChange} placeholder="0" min="0" />
-              </div>
-              <div className="form-group">
-                <label>Meter Rent</label>
-                <input type="number" name="meterRent" value={formData.meterRent} onChange={handleChange} placeholder="0" min="0" />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label>Rebate</label>
-                <input type="number" name="rebate" value={formData.rebate} onChange={handleChange} placeholder="0" min="0" />
-              </div>
-              <div className="form-group">
-                <label>Adjustments</label>
-                <input type="number" name="adjustments" value={formData.adjustments} onChange={handleChange} placeholder="0" />
-              </div>
-            </div>
-          </div>
-
-          {/* ── Optional Fields ──────────────────────── */}
-          <div className="form-section">
-            <h4>Optional Info</h4>
-
-            <div className="form-group">
+            <div className="ub-field">
               <label>Address</label>
-              <input name="address" value={formData.address} onChange={handleChange} placeholder="Consumer address" />
+              <input
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                placeholder="Address on bill"
+              />
             </div>
+          </div>
+        </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Load (KVA)</label>
-                <input type="number" name="loadKVA" value={formData.loadKVA} onChange={handleChange} placeholder="0" min="0" />
+        {/* ── Card 2: Bill Period & Usage ── */}
+        <div className="ub-card">
+          <div className="ub-card-header">
+            <div className="ub-accent green"></div>
+            <div className="ub-step-badge green">2</div>
+            <div>
+              <h3>Bill Period &amp; Usage</h3>
+              <p>Dates and consumption figures from your bill</p>
+            </div>
+          </div>
+          <div className="ub-grid3">
+            <div className="ub-field">
+              <label>Bill Month <span className="ub-req">*</span></label>
+              <input
+                name="billMonth"
+                value={form.billMonth}
+                onChange={handleChange}
+                placeholder="MM/YYYY"
+              />
+            </div>
+            <div className="ub-field">
+              <label>Bill Date <span className="ub-req">*</span></label>
+              <input name="billDate" type="date" value={form.billDate} onChange={handleChange} />
+            </div>
+            <div className="ub-field">
+              <label>Due Date <span className="ub-req">*</span></label>
+              <input name="dueDate" type="date" value={form.dueDate} onChange={handleChange} />
+            </div>
+          </div>
+
+          <div className="ub-divider"></div>
+
+          <div className="ub-grid3">
+            <div className="ub-field">
+              <label>Units Billed (kWh) <span className="ub-req">*</span></label>
+              <input
+                name="unitsBilled" type="number"
+                value={form.unitsBilled} onChange={handleChange}
+                placeholder="e.g. 36"
+              />
+            </div>
+            <div className="ub-field">
+              <label>Load (KVA)</label>
+              <input
+                name="loadKVA" type="number"
+                value={form.loadKVA} onChange={handleChange}
+                placeholder="e.g. 0.4"
+              />
+            </div>
+            <div className="ub-field">
+              <label>Security Deposit (₹)</label>
+              <div className="ub-prefix">
+                <input
+                  name="securityDeposit" type="number"
+                  value={form.securityDeposit} onChange={handleChange}
+                  placeholder="0"
+                />
               </div>
-              <div className="form-group">
-                <label>Security Deposit</label>
-                <input type="number" name="securityDeposit" value={formData.securityDeposit} onChange={handleChange} placeholder="0" min="0" />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Card 3: Charges Breakdown ── */}
+        <div className="ub-card">
+          <div className="ub-card-header">
+            <div className="ub-accent amber"></div>
+            <div className="ub-step-badge amber">3</div>
+            <div>
+              <h3>Charges Breakdown</h3>
+              <p>All charge components from the bill details section</p>
+            </div>
+          </div>
+          <div className="ub-grid2">
+            <div className="ub-field">
+              <label>Energy Charges (₹)</label>
+              <div className="ub-prefix">
+                <input name="energyCharges" type="number" value={form.energyCharges} onChange={handleChange} placeholder="0" />
+              </div>
+            </div>
+            <div className="ub-field">
+              <label>Fixed / Demand Charges (₹)</label>
+              <div className="ub-prefix">
+                <input name="fixedDemandCharges" type="number" value={form.fixedDemandCharges} onChange={handleChange} placeholder="0" />
+              </div>
+            </div>
+            <div className="ub-field">
+              <label>Govt Duty (₹)</label>
+              <div className="ub-prefix">
+                <input name="govtDuty" type="number" value={form.govtDuty} onChange={handleChange} placeholder="0" />
+              </div>
+            </div>
+            <div className="ub-field">
+              <label>Meter Rent (₹)</label>
+              <div className="ub-prefix">
+                <input name="meterRent" type="number" value={form.meterRent} onChange={handleChange} placeholder="0" />
+              </div>
+            </div>
+            <div className="ub-field">
+              <label>Adjustments (₹)</label>
+              <div className="ub-prefix">
+                <input name="adjustments" type="number" value={form.adjustments} onChange={handleChange} placeholder="0" />
+              </div>
+            </div>
+            <div className="ub-field">
+              <label>Rebate (₹)</label>
+              <div className="ub-prefix">
+                <input name="rebate" type="number" value={form.rebate} onChange={handleChange} placeholder="0" />
               </div>
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="btn-upload-submit"
-            disabled={loading}
-          >
-            {loading ? "Saving..." : "⚡ Analyse My Bill"}
-          </button>
+          <div className="ub-divider"></div>
 
-        </form>
+          <div className="ub-grid2">
+            <div className="ub-field">
+              <label>Gross Amount (₹) <span className="ub-req">*</span></label>
+              <div className="ub-prefix">
+                <input
+                  name="grossAmount" type="number"
+                  value={form.grossAmount} onChange={handleChange}
+                  placeholder="0" className="ub-big-input"
+                />
+              </div>
+            </div>
+            <div className="ub-field">
+              <label>Net Amount Payable (₹) <span className="ub-req">*</span></label>
+              <div className="ub-prefix">
+                <input
+                  name="netAmount" type="number"
+                  value={form.netAmount} onChange={handleChange}
+                  placeholder="0" className="ub-big-input"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ── Summary Bar ── */}
+          <div className="ub-summary-bar">
+            <div className="ub-s-card">
+              <div className="ub-s-label">Total Charges</div>
+              <div className="ub-s-val">
+                ₹{parseFloat(form.grossAmount || 0).toLocaleString("en-IN")}
+              </div>
+            </div>
+            <div className="ub-s-card">
+              <div className="ub-s-label">Payable</div>
+              <div className="ub-s-val">
+                ₹{parseFloat(form.netAmount || 0).toLocaleString("en-IN")}
+              </div>
+            </div>
+            <div className="ub-s-card green">
+              <div className="ub-s-label green">You Saved</div>
+              <div className="ub-s-val green">₹{saved.toLocaleString("en-IN")}</div>
+            </div>
+            <div className="ub-s-card amber">
+              <div className="ub-s-label amber">Rate / Unit</div>
+              <div className="ub-s-val amber">₹{ratePerUnit}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Card 4: Attach Bill ── */}
+        <div className="ub-card">
+          <div className="ub-card-header" style={{ marginBottom: 0 }}>
+            <div className="ub-accent" style={{ background: "#8b5cf6" }}></div>
+            <div className="ub-step-badge" style={{ background: "#ede9fe", color: "#6d28d9" }}>4</div>
+            <div>
+              <h3>Attach Bill</h3>
+              <p>Upload a photo or PDF of your bill (optional)</p>
+            </div>
+          </div>
+          <div
+            className="ub-dropzone"
+            onClick={() => document.getElementById("ub-file-input").click()}
+          >
+            {file ? (
+              <span className="ub-file-name">✅ {file.name}</span>
+            ) : (
+              <span className="ub-file-placeholder">📎 Click to attach bill image or PDF</span>
+            )}
+            <input
+              id="ub-file-input"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const f = e.target.files[0];
+                if (f && f.size <= 10 * 1024 * 1024) setFile(f);
+                else if (f) alert("File must be under 10MB");
+              }}
+            />
+          </div>
+        </div>
+
+        {/* ── Submit ── */}
+        <button className="ub-submit" onClick={handleSubmit} disabled={loading}>
+          {loading ? "⏳ Saving your bill..." : "⚡ Analyse My Bill"}
+        </button>
+
+        {/* ── Supported Boards ── */}
+        <div className="ub-tags">
+          {["CESC", "MSEDCL", "BESCOM", "TPDDL", "KSEB", "+ more boards"].map((t) => (
+            <span key={t} className="ub-tag">{t}</span>
+          ))}
+        </div>
+
       </div>
     </div>
   );

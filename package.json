@@ -13,6 +13,8 @@
     "@reduxjs/toolkit": "^2.11.2",
     "axiom": "^0.48.0",
     "axios": "^1.13.6",
+    "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.71.2",
