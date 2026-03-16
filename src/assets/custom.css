@@ -30,17 +30,50 @@ body {
   z-index: 100;
 }
 
+/* ── Upload page: fully transparent navbar over forest bg ── */
+.upload-page-nav {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  position: absolute !important;
+  width: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* Navbar on upload page — transparent over forest bg */
+.ub-page ~ * .navbar,
+.navbar.navbar--transparent {
+  background: rgba(10, 30, 10, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  box-shadow: none;
+}
+
 .nav-logo {
   font-size: 20px;
   font-weight: 800;
-  color: #1e88e5;
+  color: #f59e0b;
   display: flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
 }
 
-.nav-logo span { color: #1a202c; }
+.nav-logo span { color: #fff; }
+
+.nav-logo .logo-word {
+  color: #fff;
+  font-weight: 800;
+}
+
+.nav-logo .logo-highlight {
+  color: #1e88e5;
+  font-weight: 800;
+}
 
 .nav-links {
   display: flex;
@@ -72,6 +105,38 @@ body {
 }
 
 .nav-btn:hover { background: #1565c0; }
+
+.upload-page-nav .nav-links a {
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.upload-page-nav .nav-links a:hover {
+  color: #22c55e;
+}
+
+.upload-page-nav .nav-logo {
+  color: #22c55e;
+}
+
+.upload-page-nav .nav-logo .logo-word {
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+
+.upload-page-nav .nav-logo .logo-highlight {
+  color: #22c55e;
+}
+
+.upload-page-nav .nav-btn {
+  background: #22c55e;
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(34,197,94,0.4);
+}
+
+.upload-page-nav .nav-btn:hover {
+  background: #16a34a;
+}
 
 /* =====================================================
    HOME
@@ -346,22 +411,23 @@ body {
 
 /* ============================================================
    Upload Bill Page  (ub- namespace)
-   Background: /public/bg.jpg  (forest path photo)
+   Background: /public/bg.jpg
    ============================================================ */
 
-/* ── Page Shell ───────────────────────────────────────────── */
 .ub-page {
   min-height: 100vh;
   font-family: 'DM Sans', sans-serif;
   background-image: url('/bg.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: center top;
   background-attachment: scroll;
   background-color: #0d1a0d;
-  padding: 2.5rem 1rem 5rem;
+  padding: 0 1rem 5rem;
   display: flex;
   justify-content: center;
+  position: relative;
 }
+
 
 .ub-wrap {
   width: 100%;
@@ -369,30 +435,37 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  padding-top: 5rem;
 }
 
-/* ── Page Header ──────────────────────────────────────────── */
 .ub-page-header {
   text-align: center;
-  padding: 2rem 1rem 1.4rem;
+  padding: 3rem 2rem 2rem;
   animation: ubFadeDown 0.55s ease both;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.02) 100%);
+  border-radius: 0 0 12px 12px;
+  margin-bottom: 0.5rem;
 }
 
 .ub-page-header h1 {
   font-family: 'Merriweather', serif;
-  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 900;
   color: #ffffff;
-  text-shadow: 0 2px 14px rgba(0,0,0,0.55);
-  margin-bottom: 0.45rem;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.6), 0 1px 4px rgba(0,0,0,0.5);
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
 }
 
 .ub-page-header p {
-  font-size: 0.98rem;
-  color: rgba(255,255,255,0.82);
-  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.88);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  letter-spacing: 0.1px;
 }
 
-/* ── Error Banner ─────────────────────────────────────────── */
 .ub-error {
   background: rgba(254,226,226,0.92);
   border: 1.5px solid #f87171;
@@ -405,15 +478,15 @@ body {
   animation: ubShake 0.35s ease;
 }
 
-/* ── Cards ────────────────────────────────────────────────── */
+/* ── Cards: dark glassmorphism ── */
 .ub-card {
-  background: rgba(255,255,255,0.83);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(10, 30, 10, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border-radius: 16px;
   padding: 1.6rem 2rem 1.8rem;
-  border: 1px solid rgba(255,255,255,0.55);
-  box-shadow: 0 6px 28px rgba(0,0,0,0.13);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.35);
   animation: ubFadeUp 0.5s ease both;
 }
 
@@ -422,49 +495,26 @@ body {
 .ub-card:nth-child(4) { animation-delay: 0.18s; }
 .ub-card:nth-child(5) { animation-delay: 0.24s; }
 
-/* ── Card Header ──────────────────────────────────────────── */
 .ub-card-header {
   display: flex;
-  align-items: flex-start;
-  gap: 0.85rem;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 1.4rem;
   padding-bottom: 1rem;
-  border-bottom: 1.5px solid rgba(0,0,0,0.07);
+  border-bottom: 1.5px solid rgba(255,255,255,0.1);
 }
 
-/* Coloured left accent bar */
-.ub-accent {
-  width: 4px;
-  min-height: 42px;
-  border-radius: 4px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.ub-accent.blue  { background: linear-gradient(180deg,#3b82f6,#1d4ed8); }
-.ub-accent.green { background: linear-gradient(180deg,#22c55e,#15803d); }
-.ub-accent.amber { background: linear-gradient(180deg,#f59e0b,#b45309); }
-
-/* Step number badge */
-.ub-step-badge {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.77rem; font-weight: 700;
-  flex-shrink: 0; margin-top: 2px;
-}
-.ub-step-badge.blue  { background:#dbeafe; color:#1d4ed8; }
-.ub-step-badge.green { background:#dcfce7; color:#15803d; }
-.ub-step-badge.amber { background:#fef3c7; color:#b45309; }
-
-.ub-card-header > div:last-child h3 {
-  font-size: 1.05rem; font-weight: 700;
-  color: #1a2e1a; margin-bottom: 0.18rem;
-}
-.ub-card-header > div:last-child p {
-  font-size: 0.81rem; color: #5a7a5a;
+.ub-card-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
 }
 
-/* ── Grid Layouts ─────────────────────────────────────────── */
+/* accent bars and step badges removed — now using SVG icons */
+
+/* card-header h3 now directly in .ub-card-header h3 */
+
 .ub-grid2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem 1.3rem; }
 .ub-grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem 1.3rem; }
 
@@ -476,18 +526,16 @@ body {
   .ub-card { padding: 1.2rem 1rem 1.4rem; }
 }
 
-/* ── Divider ──────────────────────────────────────────────── */
-.ub-divider { height: 1px; background: rgba(0,0,0,0.07); margin: 1.2rem 0; }
+.ub-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 1.2rem 0; }
 
-/* ── Form Fields ──────────────────────────────────────────── */
 .ub-field { display: flex; flex-direction: column; gap: 0.38rem; }
 
 .ub-field label {
   font-size: 0.75rem; font-weight: 600;
-  color: #2d5a2d; letter-spacing: 0.35px; text-transform: uppercase;
+  color: rgba(255,255,255,0.85); letter-spacing: 0.35px; text-transform: uppercase;
 }
 
-.ub-req { color: #dc2626; margin-left: 1px; }
+.ub-req { color: #f87171; margin-left: 1px; }
 
 .ub-field input,
 .ub-field select {
@@ -520,11 +568,9 @@ body {
   padding-right: 2.1rem; cursor: pointer;
 }
 
-/* Prefix wrapper */
 .ub-prefix { position: relative; }
 .ub-prefix input { padding-left: 0.82rem; }
 
-/* Big total inputs */
 .ub-big-input {
   font-size: 1.05rem !important;
   font-weight: 600 !important;
@@ -532,16 +578,15 @@ body {
   background: rgba(240,255,240,0.95) !important;
 }
 
-/* ── Summary Bar ──────────────────────────────────────────── */
 .ub-summary-bar {
   display: grid;
   grid-template-columns: repeat(4,1fr);
   gap: 0.8rem;
   margin-top: 1.3rem;
   padding: 1rem;
-  background: rgba(240,255,240,0.55);
+  background: rgba(0,0,0,0.25);
   border-radius: 12px;
-  border: 1px solid rgba(58,154,58,0.18);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 @media (max-width: 600px) { .ub-summary-bar { grid-template-columns: repeat(2,1fr); } }
@@ -550,63 +595,96 @@ body {
 
 .ub-s-label {
   font-size: 0.69rem; font-weight: 600;
-  color: #5a7a5a; letter-spacing: 0.4px;
+  color: rgba(255,255,255,0.6); letter-spacing: 0.4px;
   text-transform: uppercase; margin-bottom: 0.22rem;
 }
 
-.ub-s-val { font-size: 1.12rem; font-weight: 700; color: #1a2e1a; }
+.ub-s-val { font-size: 1.12rem; font-weight: 700; color: #ffffff; }
 
-.ub-s-label.green, .ub-s-val.green { color: #15803d; }
-.ub-s-label.amber, .ub-s-val.amber { color: #b45309; }
+.ub-s-label.green, .ub-s-val.green { color: #4ade80; }
+.ub-s-label.amber, .ub-s-val.amber { color: #fbbf24; }
 
-/* ── Drop Zone ────────────────────────────────────────────── */
 .ub-dropzone {
   margin-top: 1.1rem;
-  border: 2px dashed rgba(139,92,246,0.45);
+  border: 2px dashed rgba(34,197,94,0.5);
   border-radius: 12px;
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 2rem;
   text-align: center;
   cursor: pointer;
-  background: rgba(237,233,254,0.35);
+  background: rgba(0,0,0,0.15);
   transition: background 0.2s, border-color 0.2s, transform 0.15s;
   user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.ub-dropzone:hover {
-  background: rgba(237,233,254,0.62);
-  border-color: #7c3aed;
-  transform: scale(1.003);
+.ub-dropzone:hover,
+.ub-dropzone--active {
+  background: rgba(34,197,94,0.08);
+  border-color: #22c55e;
+  transform: scale(1.002);
 }
 
-.ub-file-placeholder { font-size: 0.93rem; color: #6d28d9; font-weight: 500; }
-.ub-file-name        { font-size: 0.93rem; color: #15803d; font-weight: 600; }
+.ub-dropzone--done {
+  border-color: #4ade80;
+  background: rgba(34,197,94,0.1);
+}
 
-/* ── Submit Button ────────────────────────────────────────── */
+.ub-dz-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.3rem;
+  font-size: 2rem;
+}
+
+.ub-dz-main {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.ub-dz-sub {
+  font-size: 0.83rem;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
+}
+
 .ub-submit {
-  width: 100%;
-  padding: 0.88rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content;
+  min-width: 220px;
+  margin: 0 auto;
+  padding: 0.9rem 2.5rem;
   font-size: 1.05rem;
   font-family: 'DM Sans', sans-serif;
   font-weight: 700;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
   color: #fff;
-  background: linear-gradient(135deg,#22c55e 0%,#15803d 100%);
-  border: none; border-radius: 12px; cursor: pointer;
-  box-shadow: 0 4px 18px rgba(21,128,61,0.4);
-  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+  background: #22c55e;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(34,197,94,0.45);
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
   animation: ubFadeUp 0.5s 0.32s ease both;
 }
 
 .ub-submit:hover:not(:disabled) {
-  background: linear-gradient(135deg,#4ade80 0%,#166534 100%);
-  box-shadow: 0 6px 24px rgba(21,128,61,0.52);
+  background: #16a34a;
+  box-shadow: 0 6px 28px rgba(34,197,94,0.55);
   transform: translateY(-2px);
 }
 
-.ub-submit:active:not(:disabled) { transform: scale(0.98); }
+.ub-submit:active:not(:disabled) { transform: scale(0.97); }
 .ub-submit:disabled { opacity: 0.65; cursor: not-allowed; }
 
-/* ── Tags Row ─────────────────────────────────────────────── */
 .ub-tags {
   display: flex; flex-wrap: wrap; gap: 0.5rem;
   justify-content: center;
@@ -614,9 +692,9 @@ body {
 }
 
 .ub-tag {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.12);
   color: rgba(255,255,255,0.88);
-  border: 1px solid rgba(255,255,255,0.35);
+  border: 1px solid rgba(255,255,255,0.25);
   border-radius: 20px;
   padding: 0.26rem 0.82rem;
   font-size: 0.77rem;
@@ -624,7 +702,6 @@ body {
   backdrop-filter: blur(6px);
 }
 
-/* ── Animations ───────────────────────────────────────────── */
 @keyframes ubFadeDown {
   from { opacity:0; transform:translateY(-20px); }
   to   { opacity:1; transform:translateY(0); }
@@ -899,7 +976,6 @@ body {
   text-align: right;
 }
 
-/* Payment */
 .payment-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -930,7 +1006,6 @@ body {
 .payment-status.overdue { color: #dc2626; }
 .payment-status.pending { color: #d97706; }
 
-/* Empty state */
 .dash-empty {
   display: flex;
   flex-direction: column;
@@ -972,12 +1047,8 @@ body {
   transition: all 0.2s;
 }
 
-.dash-upload-btn-lg:hover {
-  background: #1565c0;
-  transform: translateY(-2px);
-}
+.dash-upload-btn-lg:hover { background: #1565c0; transform: translateY(-2px); }
 
-/* Bills table */
 .bills-table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
@@ -1025,29 +1096,6 @@ body {
 }
 
 .analyse-btn:hover { background: #1e88e5; color: #fff; }
-
-/* Download button */
-.download-report-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: #fff;
-  color: #1e88e5;
-  border: 2px solid #1e88e5;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  transition: all 0.2s;
-}
-
-.download-report-btn:hover {
-  background: #1e88e5;
-  color: #fff;
-  transform: translateY(-1px);
-}
 
 /* =====================================================
    LOADER
