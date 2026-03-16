@@ -76,21 +76,13 @@ export const deleteBill = createAsyncThunk(
   }
 );
 
-// Thunk 6: Upload bill with manual form fields + analysis
+// Thunk 6: Upload bill — receives FormData directly from component
 export const uploadBill = createAsyncThunk(
   "bill/uploadBill",
-  async ({ file, ...fields }, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const formData = new FormData();
-      formData.append("bill", file);
-      Object.keys(fields).forEach((key) => formData.append(key, fields[key]));
-
       const uploadRes = await api.post("/uploads/upload-bill", formData);
-      const billId = uploadRes.data?.billId;
-
-      const analysisRes = await api.get(`/analysis/get-analysis/${billId}`);
-      return analysisRes.data;
-
+      return uploadRes.data;
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || err.message || "Upload failed"
@@ -99,22 +91,16 @@ export const uploadBill = createAsyncThunk(
   }
 );
 
-// Thunk 7: Scan bill via Claude Vision — file only, auto-extract all fields
+// Thunk 7: Scan bill via Claude Vision
 export const scanAndCreateBill = createAsyncThunk(
   "bill/scanAndCreate",
   async (file, { rejectWithValue }) => {
     try {
       const formData = new FormData();
-      formData.append("bill", file); // ✅ key must match multer field name "bill"
-
-      // ✅ NO manual Content-Type — let axios set multipart boundary automatically
+      formData.append("bill", file);
       const res = await api.post("/uploads/upload-bill", formData);
-
-      console.log("Scan response:", res.data);
       return res.data;
-
     } catch (err) {
-      console.error("Scan error:", err.response?.data || err.message);
       return rejectWithValue(
         err.response?.data?.message || err.message || "Scan failed"
       );
@@ -129,86 +115,80 @@ const billSlice = createSlice({
     billData: null,
     loading: false,
     error: null,
-    scanSuccess: false, // ✅ track scan success for navigation
+    scanSuccess: false,
   },
   reducers: {
-    clearError: (state) => { state.error = null; },
-    clearBillData: (state) => { state.billData = null; },
-    setBillData: (state, action) => { state.billData = action.payload; },
+    clearError:       (state) => { state.error = null; },
+    clearBillData:    (state) => { state.billData = null; },
+    setBillData:      (state, action) => { state.billData = action.payload; },
     clearScanSuccess: (state) => { state.scanSuccess = false; },
   },
   extraReducers: (builder) => {
     builder
 
       // ── Create Bill ──────────────────────────────
-      .addCase(createBill.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(createBill.pending,   (state) => { state.loading = true; state.error = null; })
       .addCase(createBill.fulfilled, (state, action) => {
         state.loading = false;
         state.bills.push(action.payload.data || action.payload);
       })
-      .addCase(createBill.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+      .addCase(createBill.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
 
       // ── Get All Bills ────────────────────────────
-      .addCase(getAllBills.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(getAllBills.pending,   (state) => { state.loading = true; state.error = null; })
       .addCase(getAllBills.fulfilled, (state, action) => {
         state.loading = false;
         state.bills = action.payload.data || action.payload;
       })
-      .addCase(getAllBills.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+      .addCase(getAllBills.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
 
       // ── Get Bill By ID ───────────────────────────
-      .addCase(getBillById.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(getBillById.pending,   (state) => { state.loading = true; state.error = null; })
       .addCase(getBillById.fulfilled, (state, action) => {
         state.loading = false;
         state.billData = action.payload.data || action.payload;
       })
-      .addCase(getBillById.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+      .addCase(getBillById.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
 
       // ── Update Bill ──────────────────────────────
-      .addCase(updateBill.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(updateBill.pending,   (state) => { state.loading = true; state.error = null; })
       .addCase(updateBill.fulfilled, (state, action) => {
         state.loading = false;
         const updated = action.payload.data || action.payload;
         const index = state.bills.findIndex((b) => b._id === updated._id);
         if (index !== -1) state.bills[index] = updated;
       })
-      .addCase(updateBill.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+      .addCase(updateBill.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
 
       // ── Delete Bill ──────────────────────────────
-      .addCase(deleteBill.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(deleteBill.pending,   (state) => { state.loading = true; state.error = null; })
       .addCase(deleteBill.fulfilled, (state, action) => {
         state.loading = false;
         state.bills = state.bills.filter((b) => b._id !== action.payload.id);
       })
-      .addCase(deleteBill.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+      .addCase(deleteBill.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
 
-      // ── Upload Bill (manual form fields) ─────────
-      .addCase(uploadBill.pending, (state) => { state.loading = true; state.error = null; })
+      // ── Upload Bill (manual form) ─────────────────
+      .addCase(uploadBill.pending,   (state) => { state.loading = true; state.error = null; })
       .addCase(uploadBill.fulfilled, (state, action) => {
         state.loading = false;
-        state.billData = action.payload;
         state.scanSuccess = true;
-      })
-      .addCase(uploadBill.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
-
-      // ── Scan & Create Bill (Claude Vision) ───────
-      .addCase(scanAndCreateBill.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.scanSuccess = false;
-      })
-      .addCase(scanAndCreateBill.fulfilled, (state, action) => {
-        state.loading = false;
-        state.scanSuccess = true; // ✅ UploadBill.jsx watches this to navigate
         const bill = action.payload.data || action.payload;
         state.billData = bill;
         state.bills.push(bill);
       })
-      .addCase(scanAndCreateBill.rejected, (state, action) => {
+      .addCase(uploadBill.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // ── Scan & Create Bill (Claude Vision) ────────
+      .addCase(scanAndCreateBill.pending,   (state) => { state.loading = true; state.error = null; state.scanSuccess = false; })
+      .addCase(scanAndCreateBill.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
-        state.scanSuccess = false;
-      });
+        state.scanSuccess = true;
+        const bill = action.payload.data || action.payload;
+        state.billData = bill;
+        state.bills.push(bill);
+      })
+      .addCase(scanAndCreateBill.rejected,  (state, action) => { state.loading = false; state.error = action.payload; state.scanSuccess = false; });
   },
 });
 

@@ -25,7 +25,6 @@ const initialForm = {
   securityDeposit: "",
 };
 
-/* ── SVG Icons ── */
 const IconUser = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
     stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -54,29 +53,11 @@ const IconReceipt = () => (
   </svg>
 );
 
-const IconPaperclip = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-    stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-  </svg>
-);
-
-const IconCloudUpload = () => (
-  <svg width="52" height="52" viewBox="0 0 24 24" fill="none"
-    stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="16 16 12 12 8 16"/>
-    <line x1="12" y1="12" x2="12" y2="21"/>
-    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-  </svg>
-);
-
 const UploadBill = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.bill);
   const [form, setForm] = useState(initialForm);
-  const [file, setFile] = useState(null);
-  const [dragOver, setDragOver] = useState(false);
   const [formError, setFormError] = useState("");
 
   useEffect(() => { dispatch(clearError()); }, []);
@@ -104,29 +85,19 @@ const UploadBill = () => {
         return false;
       }
     }
-    if (!file) { setFormError("Please attach your bill image or PDF"); return false; }
     return true;
   };
 
   const handleSubmit = async () => {
     if (!validate()) return;
-    const result = await dispatch(uploadBill({ file, ...form }));
-    if (uploadBill.fulfilled.match(result)) navigate("/dashboard");
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const f = e.dataTransfer.files[0];
-    if (f && f.size <= 10 * 1024 * 1024) setFile(f);
-    else if (f) alert("File must be under 10MB");
+    const result = await dispatch(uploadBill(form));
+    if (uploadBill.fulfilled.match(result)) navigate("/dashboard"); // ✅ go to dashboard after upload
   };
 
   return (
     <div className="ub-page">
       <div className="ub-wrap">
 
-        {/* ── Page Header ── */}
         <div className="ub-page-header">
           <h1>Add Electricity Bill</h1>
           <p>Keep track of your energy consumption and optimize your savings.</p>
@@ -136,7 +107,7 @@ const UploadBill = () => {
           <div className="ub-error">❌ {formError || error}</div>
         )}
 
-        {/* ── Card 1: Consumer Details ── */}
+        {/* Card 1: Consumer Details */}
         <div className="ub-card">
           <div className="ub-card-header">
             <IconUser />
@@ -145,21 +116,11 @@ const UploadBill = () => {
           <div className="ub-grid2">
             <div className="ub-field">
               <label>Consumer Number <span className="ub-req">*</span></label>
-              <input
-                name="consumerNumber"
-                value={form.consumerNumber}
-                onChange={handleChange}
-                placeholder="e.g. 12000826491"
-              />
+              <input name="consumerNumber" value={form.consumerNumber} onChange={handleChange} placeholder="e.g. 12000826491" />
             </div>
             <div className="ub-field">
               <label>Customer Name <span className="ub-req">*</span></label>
-              <input
-                name="customerName"
-                value={form.customerName}
-                onChange={handleChange}
-                placeholder="Full name on bill"
-              />
+              <input name="customerName" value={form.customerName} onChange={handleChange} placeholder="Full name on bill" />
             </div>
             <div className="ub-field">
               <label>Consumer Type</label>
@@ -171,17 +132,12 @@ const UploadBill = () => {
             </div>
             <div className="ub-field">
               <label>Address</label>
-              <input
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-                placeholder="Address on bill"
-              />
+              <input name="address" value={form.address} onChange={handleChange} placeholder="Address on bill" />
             </div>
           </div>
         </div>
 
-        {/* ── Card 2: Bill Period & Usage ── */}
+        {/* Card 2: Bill Period & Usage */}
         <div className="ub-card">
           <div className="ub-card-header">
             <IconCalendar />
@@ -190,12 +146,7 @@ const UploadBill = () => {
           <div className="ub-grid3">
             <div className="ub-field">
               <label>Bill Month <span className="ub-req">*</span></label>
-              <input
-                name="billMonth"
-                value={form.billMonth}
-                onChange={handleChange}
-                placeholder="MM/YYYY"
-              />
+              <input name="billMonth" value={form.billMonth} onChange={handleChange} placeholder="MM/YYYY" />
             </div>
             <div className="ub-field">
               <label>Bill Date <span className="ub-req">*</span></label>
@@ -212,34 +163,22 @@ const UploadBill = () => {
           <div className="ub-grid3">
             <div className="ub-field">
               <label>Units Billed (kWh) <span className="ub-req">*</span></label>
-              <input
-                name="unitsBilled" type="number"
-                value={form.unitsBilled} onChange={handleChange}
-                placeholder="e.g. 36"
-              />
+              <input name="unitsBilled" type="number" value={form.unitsBilled} onChange={handleChange} placeholder="e.g. 36" />
             </div>
             <div className="ub-field">
               <label>Load (KVA)</label>
-              <input
-                name="loadKVA" type="number"
-                value={form.loadKVA} onChange={handleChange}
-                placeholder="e.g. 0.4"
-              />
+              <input name="loadKVA" type="number" value={form.loadKVA} onChange={handleChange} placeholder="e.g. 0.4" />
             </div>
             <div className="ub-field">
               <label>Security Deposit (₹)</label>
               <div className="ub-prefix">
-                <input
-                  name="securityDeposit" type="number"
-                  value={form.securityDeposit} onChange={handleChange}
-                  placeholder="0"
-                />
+                <input name="securityDeposit" type="number" value={form.securityDeposit} onChange={handleChange} placeholder="0" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* ── Card 3: Charges Breakdown ── */}
+        {/* Card 3: Charges Breakdown */}
         <div className="ub-card">
           <div className="ub-card-header">
             <IconReceipt />
@@ -290,26 +229,17 @@ const UploadBill = () => {
             <div className="ub-field">
               <label>Gross Amount (₹) <span className="ub-req">*</span></label>
               <div className="ub-prefix">
-                <input
-                  name="grossAmount" type="number"
-                  value={form.grossAmount} onChange={handleChange}
-                  placeholder="0" className="ub-big-input"
-                />
+                <input name="grossAmount" type="number" value={form.grossAmount} onChange={handleChange} placeholder="0" className="ub-big-input" />
               </div>
             </div>
             <div className="ub-field">
               <label>Net Amount Payable (₹) <span className="ub-req">*</span></label>
               <div className="ub-prefix">
-                <input
-                  name="netAmount" type="number"
-                  value={form.netAmount} onChange={handleChange}
-                  placeholder="0" className="ub-big-input"
-                />
+                <input name="netAmount" type="number" value={form.netAmount} onChange={handleChange} placeholder="0" className="ub-big-input" />
               </div>
             </div>
           </div>
 
-          {/* ── Summary Bar ── */}
           <div className="ub-summary-bar">
             <div className="ub-s-card">
               <div className="ub-s-label">Total Charges</div>
@@ -330,52 +260,22 @@ const UploadBill = () => {
           </div>
         </div>
 
-        {/* ── Card 4: Attach Bill ── */}
-        <div className="ub-card">
-          <div className="ub-card-header">
-            <IconPaperclip />
-            <h3>Attach Bill</h3>
-          </div>
-          <div
-            className={`ub-dropzone${dragOver ? " ub-dropzone--active" : ""}${file ? " ub-dropzone--done" : ""}`}
-            onClick={() => document.getElementById("ub-file-input").click()}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
-          >
-            {file ? (
-              <>
-                <div className="ub-dz-icon">✅</div>
-                <p className="ub-dz-main">{file.name}</p>
-                <p className="ub-dz-sub">Click to change file</p>
-              </>
-            ) : (
-              <>
-                <div className="ub-dz-icon"><IconCloudUpload /></div>
-                <p className="ub-dz-main">Drag and drop your bill here</p>
-                <p className="ub-dz-sub">or click to browse files (PDF, JPG, PNG)</p>
-              </>
-            )}
-            <input
-              id="ub-file-input"
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              style={{ display: "none" }}
-              onChange={(e) => {
-                const f = e.target.files[0];
-                if (f && f.size <= 10 * 1024 * 1024) setFile(f);
-                else if (f) alert("File must be under 10MB");
-              }}
-            />
-          </div>
-        </div>
-
-        {/* ── Submit ── */}
+        {/* Submit */}
         <button className="ub-submit" onClick={handleSubmit} disabled={loading}>
-          {loading ? "⏳ Saving your bill..." : <><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight:"8px",verticalAlign:"middle"}}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span style={{verticalAlign:"middle"}}>Analyse My Bill</span></> }
+          {loading
+            ? "⏳ Saving your bill..."
+            : <>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2"
+                  strokeLinecap="round" strokeLinejoin="round"
+                  style={{ marginRight: "8px", verticalAlign: "middle" }}>
+                  <line x1="18" y1="20" x2="18" y2="10"/>
+                  <line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span style={{ verticalAlign: "middle" }}>Analyse My Bill</span>
+              </>
+          }
         </button>
-
-
 
       </div>
     </div>

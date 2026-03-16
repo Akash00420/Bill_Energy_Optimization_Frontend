@@ -15,7 +15,7 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       await dispatch(login(data)).unwrap();
-      navigate("/dashboard");
+      navigate("/upload"); // ✅ go to upload after login
     } catch (err) {
       console.log("Login failed:", err);
     }
@@ -76,11 +76,11 @@ const Login = () => {
             </div>
 
             <button type="submit" className="auth-submit-btn" disabled={loading}>
-              {loading ? "Signing in..." : "Login"}
+              {loading ? "Signing in..." : "Login →"}
             </button>
           </form>
 
-          <div className="auth-divider"><span>OR CONTINUE WITH</span></div>
+          <div className="auth-divider"><span>OR</span></div>
 
           <p className="auth-switch">
             Don't have an account?{" "}
