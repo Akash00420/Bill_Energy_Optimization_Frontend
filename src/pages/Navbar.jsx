@@ -7,6 +7,11 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const isUpload = location.pathname === "/upload";
+  const isHome     = location.pathname === "/";
+  const isLogin    = location.pathname === "/login";
+  const isRegister = location.pathname === "/register";
+
+  if (isHome || isLogin || isRegister) return null;
 
   const stored = sessionStorage.getItem("energy_token");
   const token = stored ? JSON.parse(stored)?.token : null;

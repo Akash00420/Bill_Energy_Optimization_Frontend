@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../Reducer/AuthSlice"; // adjust path if needed
+import { login } from "../Reducer/AuthSlice";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,11 +10,7 @@ const Login = () => {
   const { loading, error } = useSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
     try {
@@ -26,72 +22,73 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-top">
-          <div className="auth-icon">⚡</div>
-          <h2>Welcome Back</h2>
-          <p>Login to view your energy insights</p>
+    <div className="auth-page">
+      <div className="auth-card-new">
+
+        {/* Green header band */}
+        <div className="auth-card-header login-header">
+          <div className="auth-logo-circle">⚡</div>
+          <p className="auth-brand">myEnergy</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Email */}
-          <div className="form-group">
-            <label>Email Address</label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              {...register("email", { required: "Email is required" })}
-            />
-            {errors.email && (
-              <span className="text-red">{errors.email.message}</span>
-            )}
-          </div>
+        {/* Form body */}
+        <div className="auth-card-body">
+          <h2 className="auth-title">Welcome Back</h2>
+          <p className="auth-subtitle">Login to optimize your energy bills</p>
 
-          {/* Password */}
-          <div className="form-group">
-            <label>Password</label>
-            <div className="input-wrapper">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                {...register("password", { required: "Password is required" })}
-              />
-              <span
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? "Hide" : "Show"}
-              </span>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="auth-field">
+              <label>Email Address</label>
+              <div className="auth-input-wrap">
+                <span className="auth-input-icon">✉️</span>
+                <input
+                  type="email"
+                  placeholder="name@energy.com"
+                  {...register("email", { required: "Email is required" })}
+                />
+              </div>
+              {errors.email && <span className="text-red">{errors.email.message}</span>}
             </div>
-            {errors.password && (
-              <span className="text-red">{errors.password.message}</span>
-            )}
-          </div>
 
-          {/* Server error from Redux */}
-          {error && <div className="text-red error-msg">{error}</div>}
+            <div className="auth-field">
+              <label>Password</label>
+              <div className="auth-input-wrap">
+                <span className="auth-input-icon">🔒</span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  {...register("password", { required: "Password is required" })}
+                />
+                <span className="auth-eye" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? "🙈" : "👁️"}
+                </span>
+              </div>
+              {errors.password && <span className="text-red">{errors.password.message}</span>}
+            </div>
 
-          {/* Remember Me + Forgot */}
-          <div className="auth-options">
-            <label className="remember-label">
-              <input type="checkbox" /> Remember me
-            </label>
-            <span className="forgot-password">Forgot Password?</span>
-          </div>
+            {error && <div className="text-red error-msg">{error}</div>}
 
-          {/* Submit */}
-          <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? "Signing in..." : "Login"}
-          </button>
-        </form>
+            <div className="auth-options-row">
+              <label className="auth-check-label">
+                <input type="checkbox" /> Remember me
+              </label>
+              <span className="auth-forgot">Forgot Password?</span>
+            </div>
 
-        <p className="auth-footer">
-          Don't have an account?{" "}
-          <Link to="/register" className="auth-link">
-            Register
-          </Link>
-        </p>
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
+              {loading ? "Signing in..." : "Login"}
+            </button>
+          </form>
+
+          <div className="auth-divider"><span>OR CONTINUE WITH</span></div>
+
+          <p className="auth-switch">
+            Don't have an account?{" "}
+            <Link to="/register" className="auth-switch-link">Register now</Link>
+          </p>
+
+          <p className="auth-tagline">SECURE • SUSTAINABLE • SIMPLE</p>
+        </div>
       </div>
     </div>
   );
